@@ -98,7 +98,7 @@ spec:
     zone: us-east-1b
   topology:
     dns:
-      type: Public
+      type: Private
     masters: private
     nodes: private
 ---

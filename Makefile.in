@@ -67,7 +67,7 @@ kops-export:
 
 k8s-init: cluster.yaml kops-s3-replace kops-create-secret kops-update
 
-k8s-update: kops-s3-replace kops-update kops-update-yes kops-rolling-update kops-rolling-update-yes
+k8s-update: kops-update kops-update-yes kops-rolling-update kops-rolling-update-yes
 
 all: k8s-init kops-update-yes kops-export
 
