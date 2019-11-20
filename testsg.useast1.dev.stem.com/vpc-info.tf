@@ -14,7 +14,7 @@ data "aws_vpc" "selected" {
 data "aws_subnet_ids" "private" {
   vpc_id = "${data.aws_vpc.selected.id}"
   tags = {
-    SubnetType = "Private"
+    SubnetTier = "Private"
   }
 }
 data "aws_subnet" "private" {
@@ -29,7 +29,7 @@ output "private_subnet_ids" {
 data "aws_subnet_ids" "public" {
   vpc_id = "${data.aws_vpc.selected.id}"
   tags = {
-    SubnetType = "Public"
+    SubnetTier = "Public"
   }
 }
 data "aws_subnet" "public" {

@@ -20,7 +20,7 @@ resource "aws_subnet" "services-pri-subnets" {
     cidr_block = "${element(var.private_subnetlist,count.index)}"
     map_public_ip_on_launch = false
     tags = {
-        SubnetType = "Private"
+        SubnetTier = "Private"
     }
 }
 
@@ -32,7 +32,7 @@ resource "aws_subnet" "services-pub-subnets" {
     map_public_ip_on_launch = true
 
     tags = {
-        SubnetType = "Public"
+        SubnetTier = "Public"
     }
 }
 
