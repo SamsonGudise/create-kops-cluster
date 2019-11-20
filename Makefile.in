@@ -1,0 +1,75 @@
+default: k8s-init
+
+tfplan.out:
+	terraform init -input=false
+	terraform plan \
+            -input=false \
+            -out tfplan.out \
+            -var cluster_name=${CLUSTER_NAME} \
+            -var region=${REGION} \
+            -var dns_zone=${DNS_ZONE} \
+            -var network_cidr=${NETWORK_CIDR} \
+            -var lb_type=${LB_TYPE} \
+            -var kops_state_store=${KOPS_STATE_STORE};
+tfapply: tfplan.out
+	terraform apply tfplan.out
+
+cluster-data.json: tfapply
+	(terraform output -json > ./cluster-data.json)
+
+cluster.yaml: cluster-data.json
+	@echo " Rendering cluster.yaml from template ..."
+	kops toolbox template \
+		--format-yaml \
+		--template ../cluster.yaml.tmpl \
+		--values ./cluster-data.json \
+		--output ./cluster.yaml
+
+kops-s3-replace:
+	kops replace \
+		--name ${CLUSTER_NAME} \
+		--state ${KOPS_STATE_STORE} \
+		--filename ./cluster.yaml \
+		--force
+
+kops-create-secret:
+	kops create secret sshpublickey admin \
+        	--name ${CLUSTER_NAME} \
+        	--state ${KOPS_STATE_STORE} \
+        	--pubkey ${SSH_PUBLIC_KEY}
+
+kops-update:
+	kops update cluster \
+        	--name ${CLUSTER_NAME} \
+        	--state ${KOPS_STATE_STORE}
+
+kops-update-yes:
+	kops update cluster \
+        	--name ${CLUSTER_NAME} \
+        	--state ${KOPS_STATE_STORE} \
+        	--yes
+
+kops-rolling-update:
+	kops rolling-update cluster ${CLUSTER_NAME} \
+		--state ${KOPS_STATE_STORE}
+
+kops-rolling-update-yes:
+	kops rolling-update cluster ${CLUSTER_NAME} \
+		--state ${KOPS_STATE_STORE} --yes
+
+kops-delete-cluster:
+	kops delete cluster ${CLUSTER_NAME} \
+	--state ${KOPS_STATE_STORE} --yes
+
+kops-export:
+	kops export kubecfg --name ${CLUSTER_NAME} \
+	--state ${KOPS_STATE_STORE}
+
+k8s-init: cluster.yaml kops-s3-replace kops-create-secret kops-update
+
+k8s-update: kops-s3-replace kops-update kops-update-yes kops-rolling-update kops-rolling-update-yes
+
+all: k8s-init kops-update-yes kops-export
+
+clean:
+	rm -rf .terraform

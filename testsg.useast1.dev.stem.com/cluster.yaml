@@ -1,0 +1,173 @@
+apiVersion: kops/v1alpha2
+kind: Cluster
+metadata:
+  name: testsg.useast1.dev.stem.com
+spec:
+  api:
+    loadBalancer:
+      type: Internal
+  authorization:
+    rbac: {}
+  channel: stable
+  cloudLabels:
+    Owner: Samson Gudise
+    Team: DevOps
+  cloudProvider: aws
+  configBase: s3://useast1.dev.stem.com/testsg.useast1.dev.stem.com
+  dnsZone: dev.stem.com
+  docker:
+    logDriver: ""
+    storageOpts:
+    - overlay2.override_kernel_check=1
+    version: 17.09.0
+  etcdClusters:
+  - etcdMembers:
+    - instanceGroup: master-us-east-1c
+      name: c
+    - instanceGroup: master-us-east-1b
+      name: b
+    - instanceGroup: master-us-east-1a
+      name: a
+    name: main
+  - etcdMembers:
+    - instanceGroup: master-us-east-1c
+      name: c
+    - instanceGroup: master-us-east-1b
+      name: b
+    - instanceGroup: master-us-east-1a
+      name: a
+    name: events
+  iam:
+    allowContainerRegistry: true
+    legacy: false
+  kubeAPIServer:
+    admissionControl:
+    - NamespaceLifecycle
+    - LimitRanger
+    - ServiceAccount
+    - PersistentVolumeLabel
+    - DefaultStorageClass
+    - DefaultTolerationSeconds
+    - MutatingAdmissionWebhook
+    - ValidatingAdmissionWebhook
+    - ResourceQuota
+    - NodeRestriction
+    - Priority
+  kubelet:
+    anonymousAuth: false
+    authenticationTokenWebhook: true
+    authorizationMode: Webhook
+  kubernetesApiAccess:
+  - 0.0.0.0/0
+  - 10.20.20.1/32
+  kubernetesVersion: 1.11.8
+  masterInternalName: api.internal.testsg.useast1.dev.stem.com
+  masterPublicName: api.testsg.useast1.dev.stem.com
+  networkCIDR: 10.16.0.0/16
+  networkID: vpc-0fa6cab888f5e849f
+  networking:
+    weave:
+      mtu: 8912
+  nonMasqueradeCIDR: 100.64.0.0/10
+  sshAccess:
+  - 0.0.0.0/0
+  subnets:
+  - id: subnet-00ce7d061e74a5d6a
+    name: us-east-1c
+    type: Utility
+    zone: us-east-1c
+  - id: subnet-0cb8c971c6cae082d
+    name: us-east-1b
+    type: Utility
+    zone: us-east-1b
+  - id: subnet-0ed80f758e1ba7474
+    name: us-east-1a
+    type: Utility
+    zone: us-east-1a
+  - id: subnet-006b0920f3a6872d3
+    name: private-us-east-1c
+    type: Private
+    zone: us-east-1c
+  - id: subnet-06f6a2afe127b89e5
+    name: private-us-east-1a
+    type: Private
+    zone: us-east-1a
+  - id: subnet-076fae433a3045e74
+    name: private-us-east-1b
+    type: Private
+    zone: us-east-1b
+  topology:
+    dns:
+      type: Public
+    masters: private
+    nodes: private
+---
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  labels:
+    kops.k8s.io/cluster: testsg.useast1.dev.stem.com
+  name: master-us-east-1c
+spec:
+  image: ami-0211df56ca498c334
+  machineType: t2.small
+  maxSize: 1
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: master-us-east-1c
+  role: Master
+  subnets:
+  - us-east-1c
+---
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  labels:
+    kops.k8s.io/cluster: testsg.useast1.dev.stem.com
+  name: master-us-east-1b
+spec:
+  image: ami-0211df56ca498c334
+  machineType: t2.small
+  maxSize: 1
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: master-us-east-1b
+  role: Master
+  subnets:
+  - us-east-1b
+---
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  labels:
+    kops.k8s.io/cluster: testsg.useast1.dev.stem.com
+  name: master-us-east-1a
+spec:
+  image: ami-0211df56ca498c334
+  machineType: t2.small
+  maxSize: 1
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: master-us-east-1a
+  role: Master
+  subnets:
+  - us-east-1a
+---
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  labels:
+    kops.k8s.io/cluster: testsg.useast1.dev.stem.com
+  name: nodes
+spec:
+  image: ami-0211df56ca498c334
+  machineType: t2.medium
+  maxSize: 9
+  minSize: 3
+  nodeLabels:
+    kops.k8s.io/instancegroup: nodes
+  role: Node
+  subnets:
+  - us-east-1c
+  - us-east-1a
+  - us-east-1b

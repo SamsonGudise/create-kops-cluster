@@ -1,0 +1,159 @@
+{
+  "ami_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "ami-0211df56ca498c334"
+  },
+  "apiaccess": {
+    "sensitive": false,
+    "type": [
+      "list",
+      "string"
+    ],
+    "value": [
+      "0.0.0.0/0",
+      "10.20.20.1/32"
+    ]
+  },
+  "availability_zones": {
+    "sensitive": false,
+    "type": [
+      "tuple",
+      [
+        "string",
+        "string",
+        "string"
+      ]
+    ],
+    "value": [
+      "us-east-1c",
+      "us-east-1b",
+      "us-east-1a"
+    ]
+  },
+  "cluster_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "testsg.useast1.dev.stem.com"
+  },
+  "dns_zone": {
+    "sensitive": false,
+    "type": "string",
+    "value": "dev.stem.com"
+  },
+  "k8sversion": {
+    "sensitive": false,
+    "type": "string",
+    "value": "1.11.8"
+  },
+  "kops_state_store": {
+    "sensitive": false,
+    "type": "string",
+    "value": "s3://useast1.dev.stem.com"
+  },
+  "lb_type": {
+    "sensitive": false,
+    "type": "string",
+    "value": "Internal"
+  },
+  "master_instance_type": {
+    "sensitive": false,
+    "type": "string",
+    "value": "t2.small"
+  },
+  "network_cidr": {
+    "sensitive": false,
+    "type": "string",
+    "value": "10.16.0.0/16"
+  },
+  "node_instance_type": {
+    "sensitive": false,
+    "type": "string",
+    "value": "t2.medium"
+  },
+  "oidcClientID": {
+    "sensitive": false,
+    "type": "string",
+    "value": "webapi-application-client-identity"
+  },
+  "oidcIssuerURL": {
+    "sensitive": false,
+    "type": "string",
+    "value": "https://sts.windows.net/directory-tenant-identity"
+  },
+  "oidcUsernameClaim": {
+    "sensitive": false,
+    "type": "string",
+    "value": "upn"
+  },
+  "owner": {
+    "sensitive": false,
+    "type": "string",
+    "value": "Samson Gudise"
+  },
+  "private_availability_zones": {
+    "sensitive": false,
+    "type": [
+      "tuple",
+      [
+        "string",
+        "string",
+        "string"
+      ]
+    ],
+    "value": [
+      "us-east-1c",
+      "us-east-1a",
+      "us-east-1b"
+    ]
+  },
+  "private_subnet_ids": {
+    "sensitive": false,
+    "type": [
+      "set",
+      "string"
+    ],
+    "value": [
+      "subnet-006b0920f3a6872d3",
+      "subnet-06f6a2afe127b89e5",
+      "subnet-076fae433a3045e74"
+    ]
+  },
+  "public_subnet_ids": {
+    "sensitive": false,
+    "type": [
+      "set",
+      "string"
+    ],
+    "value": [
+      "subnet-00ce7d061e74a5d6a",
+      "subnet-0cb8c971c6cae082d",
+      "subnet-0ed80f758e1ba7474"
+    ]
+  },
+  "region": {
+    "sensitive": false,
+    "type": "string",
+    "value": "us-east-1"
+  },
+  "sshaccess": {
+    "sensitive": false,
+    "type": [
+      "list",
+      "string"
+    ],
+    "value": [
+      "0.0.0.0/0"
+    ]
+  },
+  "team": {
+    "sensitive": false,
+    "type": "string",
+    "value": "DevOps"
+  },
+  "vpc_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "vpc-0fa6cab888f5e849f"
+  }
+}

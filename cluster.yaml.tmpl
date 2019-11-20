@@ -1,0 +1,136 @@
+apiVersion: kops/v1alpha2
+kind: Cluster
+metadata:
+  name: {{ .cluster_name.value }}
+spec:
+  api:
+    loadBalancer:
+      type: {{ .lb_type.value }}
+  authorization:
+    rbac: {}
+  channel: stable
+  cloudLabels:
+    Owner: {{ .owner.value }}
+    Team:  {{ .team.value }}
+  cloudProvider: aws
+  configBase: {{ .kops_state_store.value }}/{{ .cluster_name.value }}
+  dnsZone: {{ .dns_zone.value }}
+  docker:
+    logDriver: ""
+    storageOpts:
+    - overlay2.override_kernel_check=1
+    version: 17.09.0
+  etcdClusters:
+  - etcdMembers:
+  {{range $i, $az := .availability_zones.value}}
+    - instanceGroup: master-{{.}}
+      name: {{. | replace $.region.value "" }} {{/* converts us-west-1a to a */}}
+  {{end}}
+    name: main
+  - etcdMembers:
+  {{range $i, $az := .availability_zones.value}}
+    - instanceGroup: master-{{.}}
+      name: {{. | replace $.region.value "" }}
+  {{end}}
+    name: events
+  iam:
+    allowContainerRegistry: true
+    legacy: false
+  kubeAPIServer:
+    admissionControl:
+    - NamespaceLifecycle
+    - LimitRanger
+    - ServiceAccount
+    - PersistentVolumeLabel
+    - DefaultStorageClass
+    - DefaultTolerationSeconds
+    - MutatingAdmissionWebhook
+    - ValidatingAdmissionWebhook
+    - ResourceQuota
+    - NodeRestriction
+    - Priority
+  kubelet:
+    anonymousAuth: false
+    authenticationTokenWebhook: true
+    authorizationMode: Webhook
+  kubernetesApiAccess:
+  {{range .apiaccess.value}}
+  - {{.}}
+  {{end}}
+  kubernetesVersion: {{ .k8sversion.value }}
+  masterInternalName: api.internal.{{ .cluster_name.value }}
+  masterPublicName: api.{{ .cluster_name.value }}
+  networkCIDR: {{ .network_cidr.value }}
+  networkID: {{ .vpc_id.value }}
+  networking:
+    weave:
+      mtu: 8912
+  nonMasqueradeCIDR: 100.64.0.0/10
+  sshAccess:
+  {{range .sshaccess.value}}
+  - {{.}}
+  {{end}}
+  subnets:
+  # Public (utility) subnets, one per AZ
+  {{range $i, $id := .public_subnet_ids.value}}
+  - id: {{.}}
+    name: {{index $.availability_zones.value $i}}
+    type: Utility
+    zone: {{index $.availability_zones.value $i}}
+  {{end}}
+  # Private subnets, one per AZ
+  {{range $i, $id := .private_subnet_ids.value}}
+  - id: {{.}}
+    name: private-{{index $.private_availability_zones.value $i}}
+    type: Private
+    zone: {{index $.private_availability_zones.value $i}}
+  {{end}}
+  topology:
+    dns:
+      type: Public
+    masters: private
+    nodes: private
+
+
+---
+
+# Create Three master one per AZ
+{{range .availability_zones.value}}
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  labels:
+    kops.k8s.io/cluster: {{ $.cluster_name.value }}
+  name: master-{{.}}
+spec:
+  image: {{ $.ami_name.value }}
+  machineType: {{ $.master_instance_type.value }}
+  maxSize: 1
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: master-{{.}}
+  role: Master
+  subnets:
+  - {{.}}
+
+---
+  {{end}}
+
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  labels:
+    kops.k8s.io/cluster: {{ $.cluster_name.value }}
+  name: nodes
+spec:
+  image: {{ $.ami_name.value }}
+  machineType: {{ $.node_instance_type.value }}
+  maxSize: 9
+  minSize: 3
+  nodeLabels:
+    kops.k8s.io/instancegroup: nodes
+  role: Node
+  subnets:
+  {{range .private_availability_zones.value}}
+  - {{.}}
+  {{end}}
