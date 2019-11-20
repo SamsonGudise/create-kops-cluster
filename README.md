@@ -1,6 +1,7 @@
 # Create Kubernetes Cluster using KOPS
 
 ## Create VPC
+1. **Update `variable.tf` as needed**
 
 1.  **terraform plan**
 
