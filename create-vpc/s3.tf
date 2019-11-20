@@ -1,10 +1,3 @@
-variable s3bucket-name {
-    default = "useast1.dev.stem.com"
-}
-variable region {
-    default = "us-east-1"
-}
-variable sse_algorithm { default = "AES256" }
 
 resource "aws_kms_key" "terraform-s3-kmskey" {
   count = "${var.sse_algorithm == "AES256" ? 0 : 1}"
