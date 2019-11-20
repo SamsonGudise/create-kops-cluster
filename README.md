@@ -29,6 +29,7 @@
    
    ```
    cd testsg.useast1.dev.stem.com
+   make cluster.yaml
    make k8s-init
    ```
 

@@ -65,7 +65,7 @@ kops-export:
 	kops export kubecfg --name ${CLUSTER_NAME} \
 	--state ${KOPS_STATE_STORE}
 
-k8s-init: cluster.yaml kops-s3-replace kops-create-secret kops-update
+k8s-init: kops-s3-replace kops-create-secret kops-update
 
 k8s-update: kops-update kops-update-yes kops-rolling-update kops-rolling-update-yes
 
